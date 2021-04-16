@@ -136,14 +136,15 @@ static s64 mpcc_get_others_rate(struct sock *sk)
 	struct pcc_data *pcc = inet_csk_ca(sk);
 	const struct mptcp_cb *mpcb = tp->mpcb;
 	s64 total_rate = 0;
+	struct sock *curr_sk;
 
 	if (!mptcp(tcp_sk(sk)))
 	{
 		return 0;
 	}
-	mptcp_for_each_sub(mpcb, mptcp_sk)
+	mptcp_for_each_sk(mpcb, curr_sk)
 	{
-		struct sock *curr_sk = mptcp_to_sock(mptcp_sk);
+		//struct sock *curr_sk = mptcp_to_sock(mptcp_sk);
 		//struct tcp_sock *curr_tp = tcp_sk(curr_sk);
 		struct pcc_data *curr_pcc = inet_csk_ca(curr_sk);
 		if (curr_pcc != pcc)

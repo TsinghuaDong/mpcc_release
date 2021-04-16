@@ -110,9 +110,10 @@ static struct sock
 	bool found_unused = false;
 	bool found_unused_una = false;
 	struct mptcp_tcp_sock *mptcp;
+	struct sock *sk;
 
-	mptcp_for_each_sub(mpcb, mptcp) {
-		struct sock *sk = mptcp_to_sock(mptcp);
+	mptcp_for_each_sk(mpcb, sk) {
+		//struct sock *sk = mptcp_to_sock(mptcp);
 		struct tcp_sock *tp = tcp_sk(sk);
 		bool unused = false;
 
@@ -197,8 +198,8 @@ struct sock *pacing_get_available_subflow(struct sock *meta_sk, struct sk_buff *
 	    skb && mptcp_is_data_fin(skb)) {
 		struct mptcp_tcp_sock *mptcp;
 
-		mptcp_for_each_sub(mpcb, mptcp) {
-			sk = mptcp_to_sock(mptcp);
+		mptcp_for_each_sk(mpcb, sk) {
+			//sk = mptcp_to_sock(mptcp);
 
 			if (tcp_sk(sk)->mptcp->path_index == mpcb->dfin_path_index &&
 			    pacing_mptcp_is_available(sk, skb, zero_wnd_test))
@@ -261,9 +262,10 @@ static struct sk_buff *pacing_mptcp_rcv_buf_optimization(struct sock *sk, int pe
 	if (tcp_jiffies32 - def_p->last_rbuf_opti < usecs_to_jiffies(tp->srtt_us >> 3))
 		goto retrans;
 
+	struct tcp_sock *tp_it;
 	/* Half the cwnd of the slow flows */
-	mptcp_for_each_sub(tp->mpcb, mptcp) {
-		struct tcp_sock *tp_it = mptcp->tp;
+	mptcp_for_each_tp(tp->mpcb, tp_it) {
+		//struct tcp_sock *tp_it = mptcp->tp;
 
 		if (tp_it != tp &&
 		    TCP_SKB_CB(skb_head)->path_mask & mptcp_pi_to_flag(tp_it->mptcp->path_index)) {
@@ -286,8 +288,8 @@ retrans:
 	/* Segment not yet injected into this path? Take it!!! */
 	if (!(TCP_SKB_CB(skb_head)->path_mask & mptcp_pi_to_flag(tp->mptcp->path_index))) {
 		bool do_retrans = false;
-		mptcp_for_each_sub(tp->mpcb, mptcp) {
-			struct tcp_sock *tp_it = mptcp->tp;
+		mptcp_for_each_tp(tp->mpcb, tp_it) {
+			//struct tcp_sock *tp_it = mptcp->tp;
 
 			if (tp_it != tp &&
 			    TCP_SKB_CB(skb_head)->path_mask & mptcp_pi_to_flag(tp_it->mptcp->path_index)) {
