@@ -1,0 +1,2 @@
+1. Download mptcp-v0.94.7 from https://github.com/multipath-tcp/mptcp/releases/tag/v0.94.7
+2. Apply the mptcp-0947.patch: git apply mptcp-0947.patch
